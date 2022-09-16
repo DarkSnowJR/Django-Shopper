@@ -3,7 +3,7 @@ version: '3'
 services:
   shopper_db:
     container_name: shopper_db
-    image: postgres:latest
+    image: postgis/postgis:14-3.2
     restart: unless-stopped
     volumes:
       - shopper_db:/var/lib/postgresql/data

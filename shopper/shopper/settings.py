@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 from envparse import env
+import datetime, os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,9 +45,18 @@ INSTALLED_APPS = [
     'django_filters',
     'corsheaders',
     'drf_yasg',
+    'rest_framework.authtoken',
+    'dj_rest_auth',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'dj_rest_auth.registration',
 
     # Project Apps
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -78,7 +88,7 @@ ROOT_URLCONF = 'shopper.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates/')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -133,9 +143,7 @@ REST_FRAMEWORK = {
     'NON_FIELD_ERRORS_KEY': 'error',
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ),
 
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
@@ -143,13 +151,21 @@ REST_FRAMEWORK = {
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 10,
 
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.ScopedRateThrottle',
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'posts': '3/min',
-    }
+    # 'DEFAULT_THROTTLE_CLASSES': [
+    #     'rest_framework.throttling.ScopedRateThrottle',
+    # ],
+    # 'DEFAULT_THROTTLE_RATES': {
+    #     'posts': '3/min',
+    # }
+}
 
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = 'shopper-auth'
+JWT_AUTH_REFRESH_COOKIE = 'shopper-refresh-token'
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
 }
 
 # Internationalization
@@ -165,7 +181,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
@@ -179,3 +194,11 @@ MEDIA_ROOT = '/media/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = env.str("EMAIL_HOST")
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = env.str("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env.str("EMAIL_HOST_PASSWORD")
